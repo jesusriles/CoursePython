@@ -4,7 +4,7 @@ class Habitos:
         self.nombre: str = nombre
         self.semana: dict[int, dict[str, bool]] = {}
   
-    def iniciar_dias_semana(self) -> dict[str, bool]:
+    def _iniciar_dias_semana(self) -> dict[str, bool]:
         """ 
         Input: NA
         Return: Regresa un diccionario con {Dia de la semana: Boolean}
@@ -23,10 +23,10 @@ class Habitos:
             semana = int(num_semana)
 
             if semana not in self.semana:
-                self.semana.update({semana: self.iniciar_dias_semana()})
+                self.semana.update({semana: self._iniciar_dias_semana()})
                 print(f"[Ok] Semana {semana} creada para {self.nombre}.")
             else:
-                raise ValueError(f"La semana {semana} ya existe!")
+                raise ValueError(f"[Error] La semana {semana} ya existe!")
         except Exception as e:
             print(f"[Error] No se pudo agregar la semana, error: {e}")
 
