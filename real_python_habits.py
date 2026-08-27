@@ -21,21 +21,27 @@ class Habitos:
     def crear_semana(self, num_semana: int):
         try:
             semana = int(num_semana)
-            self.semana.update({semana: self.iniciar_dias_semana()})
+
+            if semana not in self.semana:
+                self.semana.update({semana: self.iniciar_dias_semana()})
+                print(f"[Ok] Semana {semana} creada para {self.nombre}.")
+            else:
+                raise ValueError(f"La semana {semana} ya existe!")
         except Exception as e:
-            print(f"No se pudo agregar la semana, error: {e}")
+            print(f"[Error] No se pudo agregar la semana, error: {e}")
 
 
 ejercicio = Habitos("Ejercicio")
 
 # crear semanas
 ejercicio.crear_semana(34)
-ejercicio.crear_semana(35)
-ejercicio.crear_semana(36)
+ejercicio.crear_semana(34)
 
 # checar que no se pueda repetir la semana
-ejercicio.crear_semana(34)
 ejercicio.crear_semana("qwe")
 
 # imprimir semana
 print(ejercicio.semana)
+
+lectura = Habitos("Lectura")
+lectura.crear_semana(34)
