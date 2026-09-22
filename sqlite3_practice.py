@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 from typing import Any
+from pydantic import BaseModel, Field
 
 _PATH_DB = "financesx.db"
 
@@ -37,16 +38,7 @@ class Database:
         conn.close()
 
     @staticmethod
-    def insert_register(
-            today: str, 
-            concept: str, 
-            amount: float,
-            category: str,
-            sub_category: str,
-            paid: int = 0,
-            payment_method: str = "HSBC Viva",
-            comments: str = "NA"
-            ) -> int | None:
+    def insert_register(reg: Register) -> int | None:
         ''' Insert information into the database '''
         conn = sqlite3.connect(_PATH_DB)
         cursor = conn.cursor()
@@ -56,15 +48,15 @@ class Database:
         );"""  # 9
 
         cursor.execute(query, (
-            today, 
-            "Costco", 
-            7003.94,
-            0,
-            today,
-            "HSBC Viva",
-            "Alimentos",
-            "Despensa",
-            "NA")
+            reg.date, 
+            reg.concept, 
+            reg.amount,
+            reg.paid,
+            reg.paid_date,
+            reg.payment_method,
+            reg.category,
+            reg.sub_category,
+            reg.comments)
         )
         conn.commit()
         return cursor.lastrowid
@@ -78,16 +70,22 @@ class Database:
         return cursor.fetchall()
 
 
-register = (
-    Helper.get_today_date(),  
-    "Vacaciones", 
-    230840.94,
-    "Alimentos",
-    "Despensa",
-)
+class Register(BaseModel):
+    date: str = Field(default_factory=Helper.get_today_date)
+    concept: str = Field(min_length=1, max_length=100)
+    amount: float = Field(gt=0)
+    category: str = Field(min_length=1, max_length=50)
+    sub_category: str = Field(min_length=1, max_length=50)
+    paid: bool = False
+    paid_date: str | None = None
+    payment_method: str = "HSBC Viva"
+    comments: str = Field(default="NA", max_length=255)
+
+
+register = Register(concept="Hello World", amount=99.80, category="Categoria", sub_category="Sub categoria!", paid_date="")
 
 Database.create_database()
-Database.insert_register(*register)
+Database.insert_register(register)
 registers = Database.get_all_registers()
 
 for register in registers:
