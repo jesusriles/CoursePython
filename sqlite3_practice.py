@@ -37,15 +37,16 @@ class Database:
         conn.close()
 
     @staticmethod
-    def insert_register(today: str, 
-                        concept: str, 
-                        amount: float,
-                        category: str,
-                        sub_category: str,
-                        paid: int = 0,
-                        payment_method: str = "HSBC Viva",
-                        comments: str = "NA"
-                        ) -> int | None:
+    def insert_register(
+            today: str, 
+            concept: str, 
+            amount: float,
+            category: str,
+            sub_category: str,
+            paid: int = 0,
+            payment_method: str = "HSBC Viva",
+            comments: str = "NA"
+            ) -> int | None:
         ''' Insert information into the database '''
         conn = sqlite3.connect(_PATH_DB)
         cursor = conn.cursor()
@@ -85,9 +86,10 @@ register = (
     "Despensa",
 )
 
-today = Helper.get_today_date()
 Database.create_database()
 Database.insert_register(*register)
+registers = Database.get_all_registers()
 
-for x in Database.get_all_registers():
-    print(x)
+for register in registers:
+    print(register)
+
