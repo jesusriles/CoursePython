@@ -14,25 +14,35 @@ def get_today_date() -> str:
 
 
 def create_database() -> None:
+    ''' Create database and tables '''
     conn = sqlite3.connect(_PATH_DB)
+    cursor = conn.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+            date TEXT,
+            name TEXT, 
+            amount INTEGER,
+            paid INTEGER,
+            paid_date TEXT,
+            payment_method TEXT,
+            category TEXT,
+            sub_category TEXT,
+            comments TEXT)
+        """)
     conn.close()
 
 
-def insert_register() -> int | None:
+def insert_register(today: str, 
+                    concept: str, 
+                    amount: float,
+                    category: str,
+                    sub_category: str,
+                    paid: int = 0,
+                    payment_method: str = "HSBC Viva",
+                    comments: str = "NA"
+                    ) -> int | None:
+    ''' Insert information into the database '''
     conn = sqlite3.connect(_PATH_DB)
     cursor = conn.cursor()
-
-    cursor.execute("""CREATE TABLE IF NOT EXISTS users (
-    date TEXT,
-    name TEXT, 
-    amount INTEGER,
-    paid INTEGER,
-    paid_date TEXT,
-    payment_method TEXT,
-    category TEXT,
-    sub_category TEXT,
-    comments TEXT)
-    """)
 
     query = """INSERT INTO users VALUES (
     ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -53,16 +63,25 @@ def insert_register() -> int | None:
     return cursor.lastrowid
 
 
-def return_all_registers() -> list[Any]:
+def get_all_registers() -> list[Any]:
+    ''' Return all the information in the database '''
     conn = sqlite3.connect(_PATH_DB)
     cursor = conn.cursor()
     cursor.execute('SELECT rowid, * FROM users')
     return cursor.fetchall()
 
 
+register = (
+    get_today_date(),  
+    "Vacaciones", 
+    230840.94,
+    "Alimentos",
+    "Despensa",
+)
+
 today = get_today_date()
 create_database()
-insert_register()
+insert_register(*register)
 
-for x in return_all_registers():
+for x in get_all_registers():
     print(x)
