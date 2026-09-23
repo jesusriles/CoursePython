@@ -1,6 +1,6 @@
 import sqlite3
 import datetime
-from typing import Any
+from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 _PATH_DB = "finances.db"
@@ -79,6 +79,7 @@ class Database:
 
 
 class Register(BaseModel):
+
     date: str = Field(default_factory=Helper.get_today_date)
     concept: str = Field(min_length=1, max_length=100)
     amount: float = Field(gt=0)
@@ -86,7 +87,9 @@ class Register(BaseModel):
     sub_category: str = Field(default="Empty", min_length=1, max_length=20)
     paid: bool = False
     paid_date: str = Field(default="Empty")
-    payment_method: str = Field(default="Empty")
+    payment_method: Literal['HSBC Viva',
+                            'Santander World Elite', 
+                            'Empty'] = 'Empty'
     comments: str = Field(default="Empty", max_length=255)
 
 
