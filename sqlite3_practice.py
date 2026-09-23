@@ -3,7 +3,7 @@ import datetime
 from typing import Any
 from pydantic import BaseModel, Field
 
-_PATH_DB = "financesx.db"
+_PATH_DB = "finances.db"
 
 
 class Helper:
@@ -21,7 +21,7 @@ class Database:
 
     @staticmethod
     def create_database() -> None:
-        ''' Create database and tables '''
+        ''' Create the database and the required tables. '''
         conn = sqlite3.connect(_PATH_DB)
         cursor = conn.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS users (
@@ -39,7 +39,7 @@ class Database:
 
     @staticmethod
     def insert_register(reg: Register) -> int | None:
-        ''' Insert information into the database '''
+        ''' Insert information into the database. '''
         conn = sqlite3.connect(_PATH_DB)
         cursor = conn.cursor()
 
@@ -63,10 +63,18 @@ class Database:
 
     @staticmethod
     def get_all_registers() -> list[Any]:
-        ''' Return all the information in the database '''
+        ''' Return all the information in the database. '''
         conn = sqlite3.connect(_PATH_DB)
         cursor = conn.cursor()
         cursor.execute('SELECT rowid, * FROM users')
+        return cursor.fetchall()
+
+    @staticmethod
+    def get_all_categories() -> list[Any]:
+        ''' Return all the categories. '''
+        conn = sqlite3.connect(_PATH_DB)
+        cursor = conn.cursor()
+        cursor.execute('SELECT DISTINCT category FROM users;')
         return cursor.fetchall()
 
 
@@ -74,20 +82,24 @@ class Register(BaseModel):
     date: str = Field(default_factory=Helper.get_today_date)
     concept: str = Field(min_length=1, max_length=100)
     amount: float = Field(gt=0)
-    category: str = Field(min_length=1, max_length=50)
-    sub_category: str = Field(min_length=1, max_length=50)
+    category: str = Field(default="Empty", min_length=1, max_length=20)
+    sub_category: str = Field(default="Empty", min_length=1, max_length=20)
     paid: bool = False
-    paid_date: str | None = None
-    payment_method: str = "HSBC Viva"
-    comments: str = Field(default="NA", max_length=255)
+    paid_date: str = Field(default="Empty")
+    payment_method: str = Field(default="Empty")
+    comments: str = Field(default="Empty", max_length=255)
 
 
-register = Register(concept="Hello World", amount=99.80, category="Categoria", sub_category="Sub categoria!", paid_date="")
+register = Register(concept="Hello World", 
+                    amount=99.80, 
+                    )
 
 Database.create_database()
 Database.insert_register(register)
-registers = Database.get_all_registers()
 
+registers = Database.get_all_registers()
 for register in registers:
     print(register)
 
+categories = Database.get_all_categories()
+print(categories)
